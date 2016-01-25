@@ -83,13 +83,18 @@ $xpath = new DOMXPath($dom);
 
 var_dump($xpath);
 //title 一番目 itemは最初の要素を指定 nodeValueはノードから値を取り出す
-$title = $xpath->query('//head/meta[1]')->item(0)->nodeValue;
-var_dump($title);
+$title = $xpath->query('//head/title[1]')->item(0);
+echo $title->nodeValue;
+
 
 // id="content" *=すべての要素を対象div[@id]としてもいい
-// $content = $xpath->query('//div[@id="content"]')->item(0);
+$content = $xpath->query('//div[@id="content"]')->item(0);
+echo $content->nodeValue;
 
-// echo $content->nodeValue ."\n";
+//id="header"
+$header = $xpath->query('//div[@id="header"]')->item(0);
+echo $header->nodeValue;
+
 
 //
 //取り出す方法・条件選択して
