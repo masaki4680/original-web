@@ -36,4 +36,25 @@ function json($select,$search){
 				return $json_d;
 }
 
+//ID:と日時のあるフォーマットがあるかを確認
+function match($url){
+$html = file_get_contents($url);
+$html = preg_replace('!<script.*?>.*?</script.*?>!is', '', $html);
+$html = preg_replace('!<style.*?>.*?</style.*?>!is', '', $html);
+$tags = strip_tags($html);
+$string = "ID:";
+
+
+if (mb_substr_count($tags, $string)>=2) {
+	//年月日のフォーマット検索
+	if(preg_match('/(19|20)[0-9]{2}\/[0-9]{1,2}\/[0-9]{1,2}\((月|火|水|木|金|土|日)\)\s(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9].[0-5][0-9]\sID:/', $tags)){
+		return true;
+	}else{
+          	return false;
+          }
+	} else {
+		return false;
+
+	}
+}
 ?>

@@ -7,6 +7,7 @@
 <script src="//code.jquery.com/jquery.js"></script>
 <script src="js/bootstrap.min.js"></script>
 
+
 <!-- HTML5形式の文字コード指定には対応していません meta charset="utf-8" -->
 <meta http-equiv="content-Type" content="text/html; charset=utf-8">
 
@@ -63,67 +64,45 @@ $json_d = json($_GET['select'],$_GET['search']);
 <div class="container main-content">
 <div class="row">
 <?php
-//一つ目のURLだけ取り出す
-$get_url = $json_d["items"][0]["link"];
-
-
-var_dump($get_url);
-
-
-//HTMLを読み込む
-$dom = new DOMDocument();
-
-//HTMLファイルを読み込む @=htmlに誤りがあってもエラー表示しない
-//マルチバイト文字すべてをHTMLエンティティ形式に変換する
-@$dom->loadHTMLFile(mb_convert_encoding($get_url,'HTML-ENTITIES','UTF-8'));
-
-mb_language('Japanese');
-//タグの検索
-$xpath = new DOMXPath($dom);
-
-var_dump($xpath);
-//title 一番目 itemは最初の要素を指定 nodeValueはノードから値を取り出す
-$title = $xpath->query('//head/title[1]')->item(0);
-echo $title->nodeValue;
-
-
-// id="content" *=すべての要素を対象div[@id]としてもいい
-$content = $xpath->query('//div[@id="content"]')->item(0);
-echo $content->nodeValue;
-
-//id="header"
-$header = $xpath->query('//div[@id="header"]')->item(0);
-echo $header->nodeValue;
-
-
-//
-//取り出す方法・条件選択して
-// $result = $xpath->query('//sample[[text()="green" or text()="red"]]');
-// foreach($result as $node){
-// 	echo $node->nodeValue ."<br />";
-// }
-
-
-//スクレイピングしたいhtmlを読み込む＋エラー処理
-// libxml_use_internal_errors(true);
-// $html = $dom->loadHTML( '$get_url' );
-// libxml_clear_errors();
-
-
-
-// var_dump($html);
-
+//E_NOTICEエラー以外出力する
+error_reporting(E_ALL ^ E_NOTICE);
 
 //タイトル、URL、記事上段取得
-// for($i=0; $i<10; $i++){
-// 	$get_title = $json_d["items"][$i]["title"];
-// 	$get_url = $json_d["items"][$i]["link"];
-// 	$get_snippet = $json_d["items"][$i]["snippet"];
-// 	?>
+for($i=0; $i<10; $i++){
+	$get_url = $json_d["items"][$i]["link"];
+	$get_title = $json_d["items"][$i]["title"];
+	?>
+
 
 	<?php
-// 	echo "$get_snippet"."<br><br>";
-// }
+// 	<a href="http://blog.livedoor.jp/itsoku/"><img title="IT速報" src="http://capture.heartrails.com/200x200/cool/shorten?http://blog.livedoor.jp/itsoku/" alt="http://blog.livedoor.jp/itsoku/" width="200" /></a>
+
+	//画像api
+	$url ="http://capture.heartrails.com/200x200/cool/shorten?".$get_url;
+
+	//選択がニュースかつmetaタグのdescriptionにニュースがあるかの条件分岐
+	if($_GET['select'] == 'ニュース'){
+
+		//metaタグ調査
+		$tags = get_meta_tags($get_url);
+
+		if(strpos($tags['description'],"ニュース")){
+
+			echo "・"."<a href=\"".$get_url."\">". $get_title."</a>"."     <a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br>";
+
+
+
+		}
+	}elseif($_GET['select'] == '2chまとめ'){
+
+		if(match($get_url)){
+
+			echo "・"."<a href=\"".$get_url."\">". $get_title."</a>"."     <a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br>";
+
+		}
+
+	}
+}
 ?>
 </div><!-- row -->
 </div><!-- main-content -->

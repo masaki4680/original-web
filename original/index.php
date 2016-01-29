@@ -117,6 +117,7 @@ margin-top: 5%;
 <div class="excription text-center text-info">
 <p>あらかじめ検索対象の媒体を選択して検索することができます</p>
 <p>大量な情報の中から、あなたが求める情報を素早く見つけます</p>
+
 </div><!-- excription -->
 
 </div><!-- container -->
