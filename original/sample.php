@@ -21,9 +21,15 @@
 
 // echo "<br>";
 
-// $tags = get_meta_tags('http://blog.livedoor.jp/itsoku/');
+$tags = get_meta_tags('http://www.amazon.co.jp/ref=nav_logo');
 
-// var_dump($tags);
+var_dump($tags);
+
+if(strpos($tags['keywords'],"ニュース")){
+	echo "失敗";
+}
+
+var_dump(strpos($tags['keywords'],"ニュース"));
 
 //2chまとめサイト文字のみ表示
 // readfile("http://www.yahoo.co.jp");
@@ -41,29 +47,34 @@
 // 		// エラー
 // 	}
 // }
-$url = "http://ameblo.jp/darvish-yu-blog/";
+/*
+$url = "http://yozawa-tsubasa.info/";
 $html = file_get_contents($url);
 $html = preg_replace('!<script.*?>.*?</script.*?>!is', '', $html);
 $html = preg_replace('!<style.*?>.*?</style.*?>!is', '', $html);
 $tags = strip_tags($html);
 
 var_dump($tags);
+*/
 
-// if (mb_substr_count($tags, $string)>=1) {
-// 	//年月日のフォーマット検索
-// 	if(preg_match('/(19|20)[0-9]{2}\/[0-9]{1,2}\/[0-9]{1,2}\((月|火|水|木|金|土|日)\)\s(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9].[0-5][0-9]\sID:/', $tags)){
-// 		    echo "成功";
-// 	}else{
-//           	echo "無理";
-//           }
-// 	}else {
-//            echo "無理1";
-// 	}
+$url = "http://archive.org/wayback/available"."?url="."http://archive.org/wayback/available";
+
+
+$html = file_get_contents($url);
+
+$json = json_decode($html,false);
+
+$success = $json->archived_snapshots->closest->available;
+
+if($success){
+	echo "maru";
+}
 
 
 
 //解析
-$htmla = file_get_contents('http://ameblo.jp/darvish-yu-blog/');
+
+$htmla = file_get_contents('http://yozawa-tsubasa.info/');
 $domDocument = new DOMDocument();
 libxml_use_internal_errors(true);
 $domDocument->loadHTML($htmla);
@@ -71,21 +82,18 @@ $xmlString = $domDocument->saveXML();
 //xml文書をパースしてオブジェクト化する関数
 $xmlObject = simplexml_load_string($xmlString);
 
-print_r($xmlObject);
+var_dump($xmlObject);
 
-foreach($xmlObject->head as $value){
-	$result[] = array('comment' => (string)$value->comment, 'meta' => (string)$value->meta);
-}
-
-echo json_encode($result);
 
 
 //例2
 $array = json_decode(json_encode($xmlObject), true);
 
-var_dump($array);
+// var_dump($array);
 
-echo $array['head']['comment'];
+
+
+
 
 
 

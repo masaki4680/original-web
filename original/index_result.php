@@ -39,7 +39,7 @@ $json_d = json($_GET['select'],$_GET['search']);
 
 
 <!-- ブランド名 ロゴ名の表示 -->
-<a class="navbar-brand" href="./index.php">HOME</a>
+<a class="navbar-brand" href="./index.php"><span class="glyphicon glyphicon-home"></span> HOME</a>
 
 <!-- トグルボタンの設置 -->
 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#nav-content">
@@ -53,8 +53,8 @@ $json_d = json($_GET['select'],$_GET['search']);
 
 <!-- リンクリスト メニューリスト -->
 <ul class="nav navbar-nav">
-<li><a href="">企業概要</a></li>
-<li><a href="">お問い合わせ</a></li>
+<li><a href=""><span class="glyphicon glyphicon-briefcase"></span> 企業概要</a></li>
+<li><a href=""><span class="glyphicon glyphicon-envelope"></span> お問い合わせ</a></li>
 </ul>
 </div><!--nav-content -->
 </nav>
@@ -68,6 +68,11 @@ $json_d = json($_GET['select'],$_GET['search']);
 error_reporting(E_ALL ^ E_NOTICE);
 
 //タイトル、URL、記事上段取得
+
+?>
+<table class="table table-striped table-bordered">
+<?php
+
 for($i=0; $i<10; $i++){
 	$get_url = $json_d["items"][$i]["link"];
 	$get_title = $json_d["items"][$i]["title"];
@@ -75,7 +80,6 @@ for($i=0; $i<10; $i++){
 
 
 	<?php
-// 	<a href="http://blog.livedoor.jp/itsoku/"><img title="IT速報" src="http://capture.heartrails.com/200x200/cool/shorten?http://blog.livedoor.jp/itsoku/" alt="http://blog.livedoor.jp/itsoku/" width="200" /></a>
 
 	//画像api
 	$url ="http://capture.heartrails.com/200x200/cool/shorten?".$get_url;
@@ -86,24 +90,57 @@ for($i=0; $i<10; $i++){
 		//metaタグ調査
 		$tags = get_meta_tags($get_url);
 
-		if(strpos($tags['description'],"ニュース")){
+		if(strpos($tags['keywords'],"ニュース")){
 
-			echo "・"."<a href=\"".$get_url."\">". $get_title."</a>"."     <a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br>";
-
-
-
+?>
+<tr>
+<?php
+echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
+?>
+</tr>
+<?php
 		}
-	}elseif($_GET['select'] == '2chまとめ'){
+
+
+	}elseif($_GET['select'] == '2chまとめ'){//カテゴリーが2chまとめの時の処理
 
 		if(match($get_url)){
+			?>
+			<tr>
+          <?php
+			echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
+           ?>
+			</tr>
 
-			echo "・"."<a href=\"".$get_url."\">". $get_title."</a>"."     <a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br>";
+			<?php
+		}
+
+	}elseif($_GET['select'] == 'ブログ'){//ブログの時の処理
+
+		//metaタグ調査
+		$tags = get_meta_tags($get_url);
+
+		//ニュースでない可能性と2chまとめの可能性を外す
+		if(!strpos($tags['keywords'],"ニュース") && !match($get_url)){
+
+			//アーカイブがあるか調べる
+			if(archive($get_url)){
+				?>
+				<tr>
+				<?php
+				echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
+				?>
+				</tr>
+				<?php
+			}
 
 		}
 
 	}
 }
 ?>
+</table>
+
 </div><!-- row -->
 </div><!-- main-content -->
 

@@ -57,4 +57,17 @@ if (mb_substr_count($tags, $string)>=2) {
 
 	}
 }
+
+//アーカイブがあるか判断する
+function archive($url){
+	$api = "http://archive.org/wayback/available"."?url=".$url;
+
+	$html = file_get_contents($api);
+
+	$json = json_decode($html,false);
+
+	$success = $json->archived_snapshots->closest->available;
+
+	return $success;
+}
 ?>
