@@ -1,3 +1,14 @@
+<?php
+require_once("function.php");
+
+//E_NOTICEエラー以外出力する
+error_reporting(E_ALL ^ E_NOTICE);
+
+const IMAGE = 'http://capture.heartrails.com/200x200/cool/shorten?';
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -26,14 +37,7 @@ margin-top: 100px;
 </style>
 </head>
 <body>
-<?php
-require_once("function.php");
 
-
-//以下１０件文のURLを取得する
-$json_d = json($_GET['select'],$_GET['search']);
-
-?>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 <div class="navbar-header">
 
@@ -63,83 +67,130 @@ $json_d = json($_GET['select'],$_GET['search']);
 <!-- main-content -->
 <div class="container main-content">
 <div class="row">
+
+
 <?php
-//E_NOTICEエラー以外出力する
-error_reporting(E_ALL ^ E_NOTICE);
 
-//タイトル、URL、記事上段取得
+//選択がニュースの時
+if($_GET['select'] == 'ニュース'){
+	//１０個のループ
+	for($i=0; $i<10; $i++){
+		//リンク先とタイトルを引っ張る
+		$json_d = json($_GET['select'],$_GET['search']);
 
+		//リンク先とタイトルを引っ張る
+		$get_url = $json_d["items"][$i]["link"];
+		$get_title = $json_d["items"][$i]["title"];
+
+
+		//画像リンクのapi
+		$url = IMAGE.$get_url;
+
+		//metaタグ調査&metaタグのキーワード抽出
+		$meta = meta($get_url);
+
+		//メタタグのキーワードの欄にニュースがあるか
+		if(strpos($meta['0'],"ニュース")!== false){
 ?>
 <table class="table table-striped table-bordered">
-<?php
-
-for($i=0; $i<10; $i++){
-	$get_url = $json_d["items"][$i]["link"];
-	$get_title = $json_d["items"][$i]["title"];
-	?>
-
-
-	<?php
-
-	//画像api
-	$url ="http://capture.heartrails.com/200x200/cool/shorten?".$get_url;
-
-	//選択がニュースかつmetaタグのdescriptionにニュースがあるかの条件分岐
-	if($_GET['select'] == 'ニュース'){
-
-		//metaタグ調査
-		$tags = get_meta_tags($get_url);
-
-		if(strpos($tags['keywords'],"ニュース")){
-
-?>
 <tr>
 <?php
 echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
 ?>
 </tr>
+</table>
 <?php
 		}
-
-
-	}elseif($_GET['select'] == '2chまとめ'){//カテゴリーが2chまとめの時の処理
-
-		if(match($get_url)){
-			?>
-			<tr>
-          <?php
-			echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
-           ?>
-			</tr>
-
-			<?php
-		}
-
-	}elseif($_GET['select'] == 'ブログ'){//ブログの時の処理
-
-		//metaタグ調査
-		$tags = get_meta_tags($get_url);
-
-		//ニュースでない可能性と2chまとめの可能性を外す
-		if(!strpos($tags['keywords'],"ニュース") && !match($get_url)){
-
-			//アーカイブがあるか調べる
-			if(archive($get_url)){
-				?>
-				<tr>
-				<?php
-				echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
-				?>
-				</tr>
-				<?php
-			}
-
-		}
-
 	}
+}else if($_GET['select'] == '2chまとめ'){//カテゴリーが2chまとめを選択された時
+     for($i=0; $i<10; $i++){
+     	//リンク先とタイトルを引っ張る
+     	$json_d = json($_GET['select'],$_GET['search']);
+
+     	//リンク先とタイトルを引っ張る
+     	$get_url = $json_d["items"][$i]["link"];
+     	$get_title = $json_d["items"][$i]["title"];
+
+     	//画像リンクのapi
+     	$url = IMAGE.$get_url;
+
+     	if(match($get_url)){
+     		?><table class="table table-striped table-bordered">
+     				<tr>
+     	          <?php
+     				echo "<th>"."<a href=\"".$get_url."\">". $get_title."</a>"."</th><th><a href='".$get_url."'><img src='".$url."' alt='".$get_url."' width='200' /></a>"."<br></th>";
+     	           ?>
+     				</tr>
+              </table>
+     				<?php
+     			}
+     }
+
+}else if($_GET['select'] == 'ブログ'){//カテゴリーがブログの時の処理
+
+	for($i=0; $i<10; $i++){
+
+	//リンク先とタイトルを引っ張る
+	$json_d = json($_GET['select'],$_GET['search']);
+
+	//画像リンクのapi
+	$url = IMAGE.$json_d['0'];
+
+	//metaタグ調査&metaタグ抽出
+	$meta = meta($json_d['0']);
+
+	//2chまとめは媒体がブログなのでの可能性を外す
+	if(!match($json_d['0'])){
+
+		//点数をつける
+		$i=0;
+
+		if(strpos($meta['1'],"width=device-width")!== false){
+			$i += 1;
+		}
+		if(strpos($meta['2'],'ブログ')!== false){
+			$i += 1;
+		}
+		if(strpos($meta['0'],'ブログ')!== false){
+			$i += 1;
+		}
+		if(strpos($meta['3'],'summary')!== false){
+			$i += 1;
+		}
+		if(isset($tags['google-site-verification'])){
+			$i += 1;
+		}
+
+		//点数が0のものは除外する
+        if($i>0){
+        	//点数に応じて格納
+        	$data[$i][] = $json_d['0'];
+
+        }
+	}
+
+  }
+
+  ?>
+  <table class="table table-striped table-bordered">
+  <tr>
+  <?php
+  //降順に表示
+  rsort($data);
+
+  foreach($data as $key){
+  	foreach($key as $link){
+  		echo "<th>"."<a href=\"".$link."\">". $json_d['1']."</a>"."</th><th><a href='".$link."'><img src='".$url."' alt='".$link."' width='200' /></a>"."<br></th>";
+  	}
+
+  }
+  ?>
+  </tr>
+  </table>
+  <?php
 }
 ?>
-</table>
+
 
 </div><!-- row -->
 </div><!-- main-content -->

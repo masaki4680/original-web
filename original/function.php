@@ -34,6 +34,8 @@ function json($select,$search){
 				$json_d = json_decode($json,true);
 
 				return $json_d;
+
+
 }
 
 //ID:と日時のあるフォーマットがあるかを確認
@@ -44,7 +46,9 @@ $html = preg_replace('!<style.*?>.*?</style.*?>!is', '', $html);
 $tags = strip_tags($html);
 $string = "ID:";
 
+var_dump($tags);
 
+   //ID:2回以上
 if (mb_substr_count($tags, $string)>=2) {
 	//年月日のフォーマット検索
 	if(preg_match('/(19|20)[0-9]{2}\/[0-9]{1,2}\/[0-9]{1,2}\((月|火|水|木|金|土|日)\)\s(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9].[0-5][0-9]\sID:/', $tags)){
@@ -70,4 +74,26 @@ function archive($url){
 
 	return $success;
 }
+
+//metaタグ調査
+function meta($url){
+	//metaタグ調査
+	$tags = get_meta_tags($url);
+
+	mb_language('japanese');
+
+	$keywords = mb_convert_encoding($tags['keywords'],"UTF-8","auto");
+
+	$viewport = mb_convert_encoding($tags['viewport'],"UTF-8","auto");
+
+	$description = mb_convert_encoding($tags['description'],"UTF-8","auto");
+
+	$twitter = mb_convert_encoding($tags['twitter:card'],"UTF-8","auto");
+
+	$meta = array($keywords,$viewport,$description,$twitter);
+
+	return $meta;
+}
+
+//
 ?>

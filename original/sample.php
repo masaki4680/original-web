@@ -20,16 +20,39 @@
 // echo $title->text();
 
 // echo "<br>";
+error_reporting(E_ALL ^ E_NOTICE);
 
-$tags = get_meta_tags('http://www.amazon.co.jp/ref=nav_logo');
+$tags = get_meta_tags('http://yozawa-tsubasa.info/');
+mb_language('japanese'); //言語を設定
 
-var_dump($tags);
+$i = 0;
 
-if(strpos($tags['keywords'],"ニュース")){
-	echo "失敗";
+if(strpos($tags['viewport'],"width=device-width")!== false ){
+	$i += 1;
+}
+if(strpos($tags['description'],'ブログ')!== false){
+	$i += 1;
+}
+if(strpos($tags['keywords'],'ブログ')!== false){
+	$i += 1;
+}
+if(strpos($tags['twitter:card'],'summary')!== false){
+	$i += 1;
+}
+if(isset($tags['google-site-verification'])!== false){
+	$i += 1;
 }
 
-var_dump(strpos($tags['keywords'],"ニュース"));
+var_dump($i);
+$tag = mb_convert_encoding($tags['description'],"UTF-8","auto");
+var_dump($tags);
+var_dump($tag);
+
+// if(strpos($tags['keywords'],"ニュース")){
+// 	echo "失敗";
+// }
+
+// var_dump(strpos($tags['keywords'],"ニュース"));
 
 //2chまとめサイト文字のみ表示
 // readfile("http://www.yahoo.co.jp");
